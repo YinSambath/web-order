@@ -21,6 +21,7 @@ export default {
 </script>
 <style scoped lang="scss">
 .navbar {
+  width: auto;
   display: flex;
   height: 6vh;
   padding: 0 3vw;

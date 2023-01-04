@@ -23,6 +23,7 @@ body {
   min-width: 270px;
   max-width: 820px;
   margin: auto;
+  overflow: hidden;
 }
 
 @media screen and (max-width: 820px) {
