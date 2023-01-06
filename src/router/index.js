@@ -1,19 +1,16 @@
 import {createRouter, createWebHashHistory, createWebHistory} from 'vue-router'
-
+import OrderView from  './../views/Order'
 const routes = [
   {
     path: '/',
     name: 'index',
     component: () => import('./../views/Index')
   },
-//   {
-//     path: '/',
-//     name: 'index',
-//     component: IndexPage,
-//     meta: {
-//         title: i18n.global.t('platform_name'),
-//     }
-//   },
+  {
+    path: '/order/:id',
+    name: 'order',
+    component: OrderView,
+  },
 ]
 
 const router = createRouter({
