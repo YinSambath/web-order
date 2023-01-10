@@ -2,7 +2,7 @@
     <div class="navbar">
       <img class="menu-icon" :src="menuIcon" alt/>
       <img class="logo" :src="logoIcon" alt/>
-      <img class="shopping-cart-icon" :src="shoppingCartIcon" alt/>
+      <img class="shopping-cart-icon" :src="shoppingCartIcon" @click="goCart" alt/>
     </div>
 </template>
 
@@ -15,6 +15,11 @@ export default {
   data() {
     return {
       menuIcon, logoIcon, shoppingCartIcon
+    }
+  },
+  methods: {
+    goCart() {
+      this.$router.push({path: '/cart'})
     }
   }
 }
