@@ -1,6 +1,8 @@
 import {createRouter, createWebHashHistory, createWebHistory} from 'vue-router'
 import OrderView from  './../views/OrderView'
 import CartView from  './../views/CartView'
+import AddressInfoView from  './../views/AddressInfoView'
+import ConfirmOrderView from  './../views/ConfirmOrderView'
 const routes = [
   {
     path: '/',
@@ -16,7 +18,17 @@ const routes = [
     path: '/cart',
     name: 'cart',
     component: CartView,
-  }
+  },
+  {
+    path: '/addressInfo',
+    name: 'addressInfo',
+    component: AddressInfoView,
+  },
+  {
+    path: '/confirmOrder',
+    name: 'confirmOrder',
+    component: ConfirmOrderView,
+  },
 ]
 
 const router = createRouter({

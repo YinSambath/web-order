@@ -1,35 +1,38 @@
 <template>
   <div id="id">
-    <router-view />
+      <router-view />
   </div>
 </template>
-<script>
 
+<script>
 export default {
-  name: 'App',
+    name: 'App',
 }
 </script>
+
 <style>
 body {
-  margin: 0;
-  background-color: #F5F5F5;
+    margin: 0;
+    background-color: #ffffff;
 }
+
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  min-width: 270px;
-  max-width: 820px;
-  margin: auto;
-  overflow: hidden;
+    font-family: Avenir, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-align: center;
+    color: #2c3e50;
+    min-width: 270px;
+    max-width: 600px;
+    margin: auto;
+    background-color: #F5F5F5;
 }
 
-@media screen and (max-width: 820px) {
-  
+@media screen and (min-width: 820px) {
+    body {
+        margin: 0;
+        background-color: #FFE8EE;
+        /* overflow: hidden; */
+    }
 }
-
-
-
 </style>

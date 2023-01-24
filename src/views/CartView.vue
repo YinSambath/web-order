@@ -27,7 +27,7 @@
                 <h4 class="red-text">Total</h4>
                 <h4 class="green-text">1500.00$</h4>
             </div>
-            <el-button class="checkout-btn">Check Out</el-button>
+            <el-button class="checkout-btn" @click="checkOut">Check Out</el-button>
         </div>
     </div>
 </template>
@@ -176,10 +176,22 @@ export default {
     methods: {
         increment(i) {
             this.items[i].quantity++;
+            console.log(this.items[i]);
         },
         decrement(i) {
             this.items[i].quantity-- ;
+            console.log(this.items[i]);
         },
+        checkOut() {
+            let phone = localStorage.getItem("phone");
+            let address = localStorage.getItem("address");
+            console.log(phone);
+            if (phone != null && address != null) {
+                this.$router.push({path: "/"});
+            } else {
+                this.$router.push({path: "/addressInfo"});
+            }
+        }
     },
     computed: {
         // subPrice() {
@@ -190,144 +202,5 @@ export default {
 
 }
 </script>
-<style scoped lang="scss" >
-    .cart-page {
-        max-width: 820px;
-        height: 100vh;
-        overflow: hidden;
-        // background-color: red;
-        .container {
-            max-height: 80vh;
-            height: 80vh;
-            overflow: auto;
-            margin-bottom: 15px;
-            .item {
-                height: 105px;
-                background-color: #ffffff;
-                margin: 15px;
-                border-radius: 12px;
-                display: flex;
-                justify-content: space-between;
-                .logo-detail {
-                    display: flex;
-
-                    img {
-                        max-width: auto;
-                        max-height: 85px;
-                        margin: auto 12px;
-                        border-radius: 50%; 
-                    }
-                    .detail {
-                        display: grid;
-                        align-items: center;
-                        margin: 15px 0;
-                        h5, p {
-                            overflow: hidden;
-                            white-space: nowrap;
-                            text-overflow: ellipsis;
-                            margin: 0;
-                            text-align: start;
-                            align-self: center;
-
-                        }
-                        p {
-                            color: #999999;
-                            font-size: 0.85rem;
-                        }
-                }
-                }
-                .quatity {
-                    margin: 15px;
-                    display: flex;
-                    justify-content: space-around;
-                    align-items: center;
-                    border-radius: 18px;
-                    max-height: 25px;
-
-                    h5 {
-                        margin: 0 10px;
-                        font-weight: 600;
-                    }
-                    .btn-minus {
-                        height: 23px;
-                        width: 23px;
-                        margin: 0 3px;
-                        background-color: #FFBC2D;
-                        border: none;
-
-                        img {
-                            max-width: 10px;
-                            color: #F2F2F2;
-                        }
-                    }
-                    .btn-plus {
-                        height: 23px;
-                        width: 23px;
-                        margin: 0 3px;
-                        border: none;
-                        background-color: #FFBC2D;
-
-                        img {
-                            max-width: 10px;
-                            color: #F2F2F2;
-                        }
-                    }
-                }
-            }
-        }
-        .price-checkout {
-            margin: 0 15px;
-            .total-price {
-                display: flex;
-                justify-content: space-between;
-
-                .red-text {
-                    margin: 12px 3px;
-                    color: #FF6464;
-                }
-                .green-text {
-                    margin: 12px 3px;
-                    color: #49A32A;
-                }
-            }
-            .checkout-btn {
-                width: 100%;
-                height: 40px;
-                border-radius: 9px;
-                background-color: #FF6464;
-                color: #ffffff;
-            }
-        }
-    }
-
-    @media screen and (max-width: 415px) {
-        .cart-page {
-            .container {
-                .item {
-                    height: 90px;
-                    .logo-detail {
-                        display: flex;
-                        
-                        img {
-                            max-height: 75px;
-                        }
-                    }
-                    .quatity {
-                        margin: 12px;
-                        h5 {
-                            margin: 0 5px;
-                        }
-                        .btn-minus {
-                            height: 16px;
-                            width: 16px;
-                        }
-                        .btn-plus {
-                            height: 16px;
-                            width: 16px;
-                        }
-                    }
-                }
-            }
-        }
-    }
+<style scoped lang="scss" src="@/styles/cart.scss">
 </style>

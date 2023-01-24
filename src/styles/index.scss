@@ -1,8 +1,8 @@
 //for desktop or tablet screen that width is greater than 600px
 .index-page {
   max-width: 820px;
-  height: auto;
-  overflow: auto;
+  height: 100vh;
+  overflow-y: auto;
 
   .filter {
     display: flex;
@@ -10,6 +10,7 @@
     max-height: 60px;
     background-color: #ffffff;
     overflow-x: scroll;
+    overflow-y: hidden;
     align-items: center;
 
     .filter-item {
@@ -68,7 +69,8 @@
     display: grid;
     grid-template-columns: repeat(3, minmax(92px,1fr));
     gap: 10px;
-    overflow: hidden;
+    height: auto;
+    overflow-y: scroll;
     margin-bottom: 10px;
 
     .item {
@@ -90,7 +92,7 @@
         }
       }
       .item-text {
-        padding: 0 2vw;
+        margin: 0 10px;
 
         .item-name {
           white-space: nowrap;

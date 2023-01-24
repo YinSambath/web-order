@@ -53,8 +53,8 @@
                 <!-- <el-checkbox label="Online activities" name="type" /> -->
             </div>
             <el-button-group class="btn-submit">
-                <el-button class="add-to-cart">Add to cart</el-button>
-                <el-button class="buy-now">Buy now</el-button>
+                <el-button class="add-to-cart" @click="goCart">Add to cart</el-button>
+                <el-button class="buy-now" @click="buyNow">Buy now</el-button>
             </el-button-group>
         </div>
     </div>
@@ -99,6 +99,18 @@ export default {
         addAdditional(value) {
             console.log(value);
         },
+        goCart() {
+            this.$router.push({ path: '/cart' })
+        },
+        buyNow() {
+            let phone = localStorage.getItem("phone");
+            let address = localStorage.getItem("address");
+            if (phone != null && address != null) {
+                this.$router.push({path: "/"});
+            } else {
+                this.$router.push({path: "/addressInfo"});
+            }
+        }
     }
 }
 </script>
