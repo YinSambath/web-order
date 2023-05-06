@@ -2,22 +2,22 @@
     <div class="index-page" >
         <NavBar />
         <div class="filter">
-            <div  class="filter-item" :class="{'filter-item-active': index === activeItem }" v-for="(item, index) in filters" :key="index" @click="doFilter(item, index)">
-                <img :src="item.icon" alt/>
+            <div  class="filter-item" :class="{'filter-item-active': index === activeItem }" v-for="(item, index) in category" :key="(item, index)" @click="doFilter(item, index)">
+                <img :src="(item.imageUrl) ? getFullPathImage(item.imageUrl) : require('@/assets/images/user_default.jpeg')" alt/>
                 <p>{{ item.name }}</p>
             </div>
         </div>
         <div class="container">
-            <div class="item" v-for="(item,index) in items" :key="index" @click="orderDetail(item.id)">
+            <div class="item" v-for="(product,productIndex) in filterProduct" :key="(product,productIndex)" @click="orderDetail(product.id)">
               <div class="item-img">
-                  <img :src="item.icon"/>
+                  <img :src=" (product.imageUrl) ? getFullPathImage(product.imageUrl) : require('@/assets/images/food_default.jpeg')" alt/>
               </div>
               <div class="item-text">
-                  <p class="item-name">{{ item.name }}</p>
+                  <p class="item-name">{{ product.name }}</p>
                   <div class="tag">
-                      <p class="item-price"> {{ item.price }}</p>
+                      <!-- <p class="item-price"> {{ product.price }}</p> -->
                   </div>
-                  <p class="counted">{{ item.id }} sold</p>
+                  <!-- <p class="counted">{{ item.id }} sold</p> -->
               </div>
 
             </div>
@@ -26,7 +26,6 @@
 </template>
     
 <script>
-import {ref} from 'vue';
 import NavBar from '@/components/NavBar.vue';
 import all from '@/assets/icons/restaurant-icon.png';
 import chiliSauce from '@/assets/icons/chili-sauce.png';
@@ -37,6 +36,7 @@ import item2 from '@/assets/icons/item-2.png';
 import item3 from '@/assets/icons/item-3.png';
 import item4 from '@/assets/icons/item-4.png';
 import item5 from '@/assets/icons/item-5.png';
+import ApiService from '@/services/ApiService';
 
 export default {
     name: "IndexPage",
@@ -44,93 +44,45 @@ export default {
     data() {
         return {
             all, chiliSauce, berverage, item1, item2, item3, item4, item5, rice,
+            search: {
+                query: "",
+            },
+            activeItem: 0,
+            category: [],
+            products: [],
+            productGroup: [],
+            filterProduct: []
         }
     },
-    setup() {
-        const activeItem = ref(0);
-        const filters = ref([
-                {
-                    name: 'All items',
-                    id: '1',
-                    icon: all,
-                },
-                {
-                    name: 'Duck',
-                    id: '2',
-                    icon: item1
-                },
-                {
-                    name: 'Rice',
-                    id: '3',
-                    icon: rice
-                },
-                {
-                    name: 'Other',
-                    id: '4',
-                    icon: chiliSauce
-                },
-                {
-                    name: 'Berverage',
-                    id: '5',
-                    icon: berverage
-                },
-            ]);
-        const items = ref([
-                {
-                    id: '1',
-                    name: 'StreetBox Roasted Duck',
-                    price: '50.00$',
-                    isHot: 1,
-                    isNew: 0,
-                    icon: item1,
-                },
-                {
-                    id: '2',
-                    name: 'StreetBox Roasted Duck',
-                    price: '50.00$',
-                    isHot: 1,
-                    isNew: 0,
-                    icon: item2
-                },
-                {
-                    id: '3',
-                    name: 'StreetBox Roasted Duck',
-                    price: '50.00$',
-                    isHot: 0,
-                    isNew: 1,
-                    icon: item3
-                },
-                {
-                    id: '4',
-                    name: 'StreetBox Roasted Duck',
-                    price: '50.00$',
-                    isHot: 0,
-                    isNew: 1,
-                    icon: item4
-                },
-                {
-                    id: '5',
-                    name: 'StreetBox Roasted Duck',
-                    price: '50.00$',
-                    isHot: 1,
-                    isNew: 0,
-                    icon: item5
-                },
-            ]);
-        return {
-            activeItem,
-            filters,
-            items,
-        }
+    created() {
+        this.getList();
     },
     methods: {
+        getList() {
+            ApiService.getHome().then((result) => {
+                console.log(result)
+                if (result.response.status === 200) {
+                    this.category = result.results.category
+                    this.products = result.results.product
+                    this.productGroup = result.results.productGroup
+                    this.doFilter()
+                }
+            })
+        },
+
         doFilter(item, index) {
             this.activeItem = index;
-            console.log(item);
+            (item) ? item : item  = this.category[0]
+            this.filterProduct = this.products.filter((product) => product.category.id === item.id)
         },
+
         orderDetail(id) {
             console.log(id);
-            this.$router.push({path: `/order/${id}`})
+            this.$router.push({path: `/product/${id}`})
+        },
+
+        getFullPathImage(path) {
+            return process.env.VUE_APP_BASE_URL + path
         },
     }
 }
