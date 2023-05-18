@@ -56,6 +56,10 @@ export default {
     },
     created() {
         this.getList();
+        console.log(this.$route)
+        // if (this.$route.query) {
+            
+        // }
     },
     methods: {
         getList() {

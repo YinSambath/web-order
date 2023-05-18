@@ -117,8 +117,9 @@ export default {
         goCart() {
             if (this.uomId) {
                 this.cart.push(this.designData())
-                console.log(this.cart)
-                this.$router.push({path: "/"});
+                this.$router.push({
+                    name: 'index',
+                });
             } else {
                 console.log("try again")
             }
@@ -138,6 +139,8 @@ export default {
             return detail;
         },
         buyNow() {
+            this.cart.push(this.designData())
+            console.log(this.cart)
             let phone = localStorage.getItem("phone");
             let address = localStorage.getItem("address");
             if (phone != null && address != null) {

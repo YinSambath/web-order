@@ -1,43 +1,33 @@
 <template>
-  <div id="id" v-if="isMobile">
-      <router-view />
-  </div>
-  <!-- <el-dialog v-model="centerDialogVisible" title="Warning" width="30%" center>
-    <span>
-      It should be noted that the content will not be aligned in center by
-      default
-    </span>
-    <template #footer>
-      <span class="dialog-footer">
-        <el-button @click="centerDialogVisible = false">Cancel</el-button>
-        <el-button type="primary" @click="centerDialogVisible = false">
-          Confirm
-        </el-button>
-      </span>
-    </template>
-  </el-dialog> -->
+    <div id="id"  v-if="mobile === true">
+    <keep-alive>
+        <router-view />
+    </keep-alive>
+    </div>
+    <div class="alert" v-else>
+        <p>Please open this website in mobile or tablet device to make your order!</p>
+    </div>
 </template>
 
 <script>
-export default {
+export default{
     name: 'App',
     data() {
         return {
-            isMobile: true,
+            mobile: true,
         }
     },  
-    created() {
-        // this.setDeviceType()
+    mounted() {
+        this.isMobile()
     },
     methods: {
-        // setDeviceType() {
-        //     const platform = navigator.userAgent.toLocaleLowerCase()
-        //     if (/mac|win|linux/i.test(platform)) {
-        //         this.isMobile = false;
-        //     } else {
-        //         this.isMobile = true;
-        //     }
-        // },
+        isMobile() {
+            if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+                return this.mobile = true;
+            } else {
+                return this.mobile = false;
+            }
+        }
     }
 }
 </script>
@@ -58,6 +48,10 @@ body {
     max-width: 600px;
     margin: auto;
     background-color: #F5F5F5;
+}
+
+.alert {
+    background-color: #fff;
 }
 
 @media screen and (min-width: 820px) {

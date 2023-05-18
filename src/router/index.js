@@ -4,11 +4,11 @@ import CartView from  './../views/CartView'
 import AddressInfoView from  './../views/AddressInfoView'
 import ConfirmOrderView from  './../views/ConfirmOrderView'
 const routes = [
-  { path: '/', name: 'index', component: () => import('./../views/IndexView') },
-  { path: '/product/:id', name: 'product', component: OrderView },
+  { path: '/', name: 'index', component: () => import('./../views/IndexView'), props: true },
+  { path: '/product/:id', name: 'product', component: OrderView, props: true },
   { path: '/cart', name: 'cart', component: CartView },
-  { path: '/addressInfo', name: 'addressInfo', component: AddressInfoView },
-  { path: '/confirmOrder', name: 'confirmOrder', component: ConfirmOrderView },
+  { path: '/addressInfo', name: 'addressInfo', component: AddressInfoView, props: true },
+  { path: '/confirmOrder', name: 'confirmOrder', component: ConfirmOrderView, props: true },
 ]
 
 const router = createRouter({
