@@ -1,11 +1,8 @@
 <template>
-    <div id="id"  v-if="mobile === true">
-    <keep-alive>
-        <router-view />
-    </keep-alive>
-    </div>
-    <div class="alert" v-else>
-        <p>Please open this website in mobile or tablet device to make your order!</p>
+    <div id="id">
+        <keep-alive>
+            <router-view />
+        </keep-alive>
     </div>
 </template>
 
@@ -14,20 +11,20 @@ export default{
     name: 'App',
     data() {
         return {
-            mobile: true,
+            // mobile: true,
         }
     },  
     mounted() {
-        this.isMobile()
+        // this.isMobile()
     },
     methods: {
-        isMobile() {
-            if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-                return this.mobile = true;
-            } else {
-                return this.mobile = false;
-            }
-        }
+        // isMobile() {
+        //     if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+        //         return this.mobile = true;
+        //     } else {
+        //         return this.mobile = false;
+        //     }
+        // }
     }
 }
 </script>

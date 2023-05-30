@@ -1,5 +1,5 @@
 <template>
-    <div class="order-detail" v-loading="loading">
+    <div class="order-detail" v-if="loading">
         <div class="top-detail">
             <img class="arrow-left" :src="arrowBack" @click="goBack" alt/>
             <img class="image-detail" :src="product.imageUrl ? getFullPathImage(product.imageUrl) : require('@/assets/images/food_default.jpeg')" alt/>
@@ -81,39 +81,40 @@ export default {
         }
     },
     created() {
-        console.log(1)
         this.getproduct();
-        console.log(1)
     },
     methods: {
         getproduct() {
-            console.log(1)
             let id = this.$route.params.id;
             ApiService.getProduct(id).then((result) => {
-                console.log(1)
                 if (result.response.status === 200 && result.results) {
                     this.product = result.results
                     console.log(this.product)
+                    this.loading = true;
                 }
             }).catch(e => console.log(e))
-            console.log(1)
         },
 
         goBack() {
             this.$router.back();
         },
+
         increment() {
             this.quantity++;
         },
+
         decrement() {
             this.quantity-- ;
         },
+
         addSize() {
             console.log(this.uomId);
         },
+
         addAdditional(value) {
             console.log(value);
         },
+
         goCart() {
             if (this.uomId) {
                 this.cart.push(this.designData())
@@ -124,6 +125,7 @@ export default {
                 console.log("try again")
             }
         },
+
         designData() {
             let detail = {
                     cost: this.product.productPrice[0].price * this.quantity,
@@ -138,6 +140,7 @@ export default {
                 }
             return detail;
         },
+
         buyNow() {
             this.cart.push(this.designData())
             console.log(this.cart)
@@ -149,7 +152,6 @@ export default {
                 this.$router.push({path: "/addressInfo"});
             }
         },
-        
         getFullPathImage(path) {
             return process.env.VUE_APP_BASE_URL + path
         },

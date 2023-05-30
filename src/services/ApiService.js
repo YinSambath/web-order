@@ -10,7 +10,8 @@ ApiService.getHome = async function() {
         .then((response) => {
             return Service.validateError(response);
         }).catch(function(error) {
-            return Service.validateError(error.response);
+            // return Service.validateError(error.response);
+            console.log(error)
         })
 };
 
