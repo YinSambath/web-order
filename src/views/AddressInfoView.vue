@@ -11,16 +11,14 @@
                 +855 
             </template>
         </el-input>
-        <br/><br/><br/><br/><br/>
+        <br/>
+        <br/>
         <h4 class="address-header" >please input your address to delivery</h4>
         <el-input class="address-input" v-model="address" placeholder="Address">
             <template #prepend>
                 <img class="current-location-icon" :src="currentLocation" />
             </template>
         </el-input>
-        <div class="location-picker">
-            Pick location
-        </div>
     </div>
     
     <el-button class="btn-confirm" @click="submitInfo">ABC</el-button>
@@ -83,7 +81,7 @@ export default {
         }
     }
     .edit-address {
-        height: 83%;
+        height: 60vh;
         h2 {
             margin: 15px 0;
             text-align: start;

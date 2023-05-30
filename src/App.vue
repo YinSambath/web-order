@@ -1,8 +1,8 @@
 <template>
     <div id="id">
-        <keep-alive>
-            <router-view />
-        </keep-alive>
+    <keep-alive>
+        <router-view />
+    </keep-alive>
     </div>
 </template>
 
@@ -10,22 +10,10 @@
 export default{
     name: 'App',
     data() {
-        return {
-            // mobile: true,
-        }
+        return {}
     },  
-    mounted() {
-        // this.isMobile()
-    },
-    methods: {
-        // isMobile() {
-        //     if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-        //         return this.mobile = true;
-        //     } else {
-        //         return this.mobile = false;
-        //     }
-        // }
-    }
+    mounted() {},
+    methods: {}
 }
 </script>
 
