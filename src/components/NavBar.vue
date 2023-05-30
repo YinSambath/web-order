@@ -2,7 +2,8 @@
     <div class="navbar">
       <img class="menu-icon" :src="menuIcon" @click="drawer = true" alt/>
       <img class="logo" :src="logoIcon" @click="goHome" alt/>
-      <img class="shopping-cart-icon" :src="shoppingCartIcon" @click="goCart" alt/>
+      <!-- <img class="shopping-cart-icon" :src="shoppingCartIcon" @click="goCart" alt/> -->
+      <el-icon><ShoppingCart /></el-icon>
     </div>
 
     <el-drawer
