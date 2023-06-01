@@ -21,7 +21,7 @@
                 </div>
             </div>
             <el-drawer
-                style="max-width: 600px; margin: 0 auto;"
+                style="max-width: 600px; margin: 0 auto; border-radius: 20px 20px 0 0;"
                 v-model="drawer"
                 direction="btt"
                 :before-close="handleClose"
@@ -35,7 +35,7 @@
                         <div class="first-detail">
                             <h5 class="item-name">{{ product.name }}</h5>
                             <div class="item-price-quantity">
-                                <p class="price">{{ "$" + calPrice(10) }}</p>
+                                <p class="price">{{ "$" + calPrice }}</p>
                                 <div class="quatity">
                                     <el-button @click.prevent="decrement" :disabled="quantity == 1" class="btn-minus" circle>
                                         <img :src="minus" />
@@ -110,7 +110,8 @@ export default {
             quantity: 1,
             additional: [],
             cart: [],
-            size: ""
+            size: "",
+            price: ""
         }
     },
     created() {
@@ -121,10 +122,9 @@ export default {
         // }
     },
     computed: {
-        calPrice(value) {
-            const price = value;
-            console.log(price)
-            return price * this.quantity;
+        calPrice: function() {
+            return (+this.price * this.quantity);
+             
         }
     },
     methods: {
@@ -146,20 +146,28 @@ export default {
         },
         orderDetail(id) {
             console.log(id);
-            console.log(this.products)
             this.product = this.products.find((item) => item.id = id);
-            console.log(this.product)
+            this.size = this.product.productPrice[0].uom.id;
+            this.price = this.product.productPrice[0].price;
             this.drawer = true;
-            // this.$router.push({path: `/product/${id}`})
+            const cart = JSON.parse(localStorage.getItem("cart"));
+            if (cart === null) {
+                this.cart = [];
+            } else {
+                this.cart = cart;
+            }
+            console.log(this.cart)
         },
         handleClose () {
+            this.drawer = true;
             ElMessageBox.confirm('Are you sure you want to close this?')
-                .then(() => {
-                    console.log(this.product)
-                    this.drawer = false;
-                }).catch(function () {
-                    // catch error
-                });
+            .then(() => {
+                console.log(this.product)
+                this.drawer = false;
+                this.quantity = 1;
+            }).catch((e) => {
+                console.log(e)
+            });
         },
         getFullPathImage(path) {
             return process.env.VUE_APP_BASE_URL + path
@@ -177,12 +185,18 @@ export default {
             console.log(value);
         },
         goCart() {
+            if (this.cart === null) {
+                this.cart = [];
+                this.cart.push(this.designData())
+                console.log(this.cart)
+                localStorage.setItem("cart", JSON.stringify(this.cart))
+            } else {
+                const oldProduct = this.cart.find((item) => item.id === this.product.id);
+                if (oldProduct) {
+                    console.log(oldProduct)
+                }
+            }
             this.drawer = false;
-            console.log()
-            const cart = JSON.parse(localStorage.getItem("cart"));
-            console.log(cart);
-            localStorage.setItem("cart", JSON.stringify(this.cart));
-            console.log(this.product)
         },
         designData() {
             let detail = {
