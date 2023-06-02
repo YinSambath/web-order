@@ -1,12 +1,12 @@
 <template>
     <div class="navbar">
-      <img class="menu-icon" :src="menuIcon" @click="drawer = true" alt/>
+      <!-- <img class="menu-icon" :src="menuIcon" @click="drawer = true" alt/> -->
       <img class="logo" :src="logoIcon" @click="goHome" alt/>
       <!-- <img class="shopping-cart-icon" :src="shoppingCartIcon" @click="goCart" alt/> -->
-      <el-icon><ShoppingCart /></el-icon>
+      <el-icon :size="25"><ShoppingCart @click="goCart" /></el-icon>
     </div>
 
-    <el-drawer
+    <!-- <el-drawer
       v-model="drawer"
       direction="ltr"
       size="50%"
@@ -14,7 +14,7 @@
       :with-header="false"
     >
       <span>drawer open</span>
-    </el-drawer>
+    </el-drawer> -->
 </template>
 
 <script>

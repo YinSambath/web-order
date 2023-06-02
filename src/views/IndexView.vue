@@ -37,10 +37,10 @@
                             <div class="item-price-quantity">
                                 <p class="price">{{ "$" + calPrice }}</p>
                                 <div class="quatity">
-                                    <el-button @click.prevent="decrement" :disabled="quantity == 1" class="btn-minus" circle>
+                                    <el-button @click.prevent="decrement" :disabled="body.detail.quantity == 1" class="btn-minus" circle>
                                         <img :src="minus" />
                                     </el-button>
-                                    <p>{{ quantity }}</p>
+                                    <p>{{ body.detail.quantity }}</p>
                                     <el-button @click.prevent="increment" class="btn-plus" circle>
                                         <img :src="plus" />
                                     </el-button>
@@ -55,7 +55,7 @@
                         <el-divider />
                         <div class="size">
                             <h5>Size</h5>
-                            <el-radio-group v-model="size" @change="addSize()" v-if="product.productUom">
+                            <el-radio-group v-model="body.detail.uom.id" @change="addSize()" v-if="product.productUom">
                                 <el-radio v-for="(uom, uomIndex) in product.productUom" :key="(uom, uomIndex)" :label="uom.uom.id" size="default" >{{ uom.uom.name }}</el-radio>
                             </el-radio-group>
                         </div>
@@ -68,10 +68,8 @@
                             <el-checkbox-group v-model="additional" @change="addAdditional(additional)">
                                 <el-checkbox v-for="(topping, toppingIndex) in product.topping" :label="topping.remark" :key="(topping, toppingIndex)" size="default">
                                     <p>{{ topping.remark }}</p>
-                                    <!-- <p>12.5$</p> -->
                                 </el-checkbox>
                             </el-checkbox-group>
-                            <!-- <el-checkbox label="Online activities" name="type" /> -->
                         </div>
                         <el-button-group class="btn-submit">
                             <el-button class="add-to-cart" @click="goCart">Add to cart</el-button>
@@ -109,28 +107,33 @@ export default {
             product: "",
             quantity: 1,
             additional: [],
-            cart: [],
-            size: "",
-            price: ""
+            cart: "",
+            body: {
+                detail: {
+                    price: "",
+                    product: {
+                        id: ""
+                    },
+                    quantity: 1,
+                    uom: {
+                        id: ""
+                    },
+                    topping: []
+                }
+            }
         }
     },
     created() {
         this.getList();
-        console.log(this.$route)
-        // if (this.$route.query) {
-            
-        // }
     },
     computed: {
         calPrice: function() {
-            return (+this.price * this.quantity);
-             
+            return (+this.body.detail.price * this.body.detail.quantity);
         }
     },
     methods: {
         getList() {
             ApiService.getHome().then((result) => {
-                console.log(result)
                 if (result.response.status === 200) {
                     this.category = result.results.category
                     this.products = result.results.product
@@ -145,18 +148,13 @@ export default {
             this.filterProduct = this.products.filter((product) => product.category.id === item.id)
         },
         orderDetail(id) {
-            console.log(id);
-            this.product = this.products.find((item) => item.id = id);
-            this.size = this.product.productPrice[0].uom.id;
-            this.price = this.product.productPrice[0].price;
             this.drawer = true;
-            const cart = JSON.parse(localStorage.getItem("cart"));
-            if (cart === null) {
-                this.cart = [];
-            } else {
-                this.cart = cart;
-            }
-            console.log(this.cart)
+            this.cart = [];
+            this.cart = (JSON.parse(localStorage.getItem("cart")) !== null) ? JSON.parse(localStorage.getItem("cart")) : [] ;
+            this.product = this.products.find((item) => item.id === id);
+            this.body.detail.price = this.product.productPrice[0].price
+            this.body.detail.uom.id = this.product.productPrice[0].uom.id
+            this.body.detail.product.id = this.product.id
         },
         handleClose () {
             this.drawer = true;
@@ -164,7 +162,6 @@ export default {
             .then(() => {
                 console.log(this.product)
                 this.drawer = false;
-                this.quantity = 1;
             }).catch((e) => {
                 console.log(e)
             });
@@ -173,47 +170,38 @@ export default {
             return process.env.VUE_APP_BASE_URL + path
         },
         increment() {
-            this.quantity++;
+            this.body.detail.quantity++;
         },
         decrement() {
-            this.quantity-- ;
+            this.body.detail.quantity-- ;
         },
         addSize() {
-            console.log(this.size);
+            console.log(this.body.detail.uom);
         },
         addAdditional(value) {
-            console.log(value);
+            this.body.detail.topping = value;
+            this.body.detail.topping = this.body.detail.topping.map((str,) => ({ remark: str}));
         },
         goCart() {
-            if (this.cart === null) {
-                this.cart = [];
-                this.cart.push(this.designData())
-                console.log(this.cart)
-                localStorage.setItem("cart", JSON.stringify(this.cart))
+            const oldProduct = this.cart.find((item) => item.product.id === this.product.id )
+            console.log(oldProduct)
+            console.log(this.body.detail.topping.every(k=>oldProduct.topping.some(d=>d.remark === k.topping.remark)))
+            console.log(this.body.detail.topping.length)
+            console.log(oldProduct.topping.length)
+            if (this.cart.length > 0 
+                && oldProduct.uom.id === this.body.detail.uom.id 
+                && oldProduct.topping.length === this.body.detail.topping.length) {
+                console.log(true)
             } else {
-                const oldProduct = this.cart.find((item) => item.id === this.product.id);
-                if (oldProduct) {
-                    console.log(oldProduct)
-                }
+                this.cart.push(this.body.detail)
             }
+            console.log(this.cart)
+            localStorage.setItem("cart", JSON.stringify(this.cart))
             this.drawer = false;
         },
-        designData() {
-            let detail = {
-                    cost: this.product.productPrice[0].price * this.quantity,
-                    id: 0,
-                    product: {
-                        id: this.product.id,
-                    },
-                    quantity: this.quantity,
-                    uom: {
-                        id: this.size,
-                    }
-                }
-            return detail;
-        },
         buyNow() {
-            this.cart.push(this.designData())
+            this.cart.push(this.body.detail)
+            localStorage.setItem("cart", JSON.stringify(this.cart))
             console.log(this.cart)
             let phone = localStorage.getItem("phone");
             let address = localStorage.getItem("address");
@@ -222,6 +210,9 @@ export default {
             } else {
                 this.$router.push({path: "/addressInfo"});
             }
+        },
+        designDataProduct() {
+
         },
     }
 }
