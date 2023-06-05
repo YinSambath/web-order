@@ -4,6 +4,24 @@
         height: 100vh;
         overflow: hidden;
         // background-color: red;
+        .navbar {
+            width: auto;
+            display: flex;
+            height: 55px;
+            padding: 0 2vw;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #ffffff;
+
+            .back {
+                cursor: pointer;
+            }
+            .deleteAll {
+                background: none;
+                border: none;
+                color: red;
+            }
+          }
         .container {
             max-height: 80vh;
             height: 80vh;

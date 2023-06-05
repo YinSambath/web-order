@@ -110,13 +110,18 @@ export default {
             cart: "",
             body: {
                 detail: {
+                    imageUrl: "",
+                    name: "",
+                    nameSecond: "",
                     price: "",
                     product: {
                         id: ""
                     },
                     quantity: 1,
                     uom: {
-                        id: ""
+                        id: "",
+                        name: "",
+                        nameSecond: ""
                     },
                     topping: []
                 }
@@ -128,7 +133,7 @@ export default {
     },
     computed: {
         calPrice: function() {
-            return (+this.body.detail.price * this.body.detail.quantity);
+            return (+this.product.productPrice[0].price * this.body.detail.quantity);
         }
     },
     methods: {
@@ -152,16 +157,37 @@ export default {
             this.cart = [];
             this.cart = (JSON.parse(localStorage.getItem("cart")) !== null) ? JSON.parse(localStorage.getItem("cart")) : [] ;
             this.product = this.products.find((item) => item.id === id);
-            this.body.detail.price = this.product.productPrice[0].price
+            this.body.detail.imageUrl = this.product.imageUrl
+            this.body.detail.name = this.product.name
+            this.body.detail.nameSecond = this.product.nameSecond
+            this.body.detail.price = this.calPrice;
             this.body.detail.uom.id = this.product.productPrice[0].uom.id
+            this.body.detail.uom.name = this.product.productPrice[0].uom.name
+            this.body.detail.uom.nameSecond = this.product.productPrice[0].uom.nameSecond
             this.body.detail.product.id = this.product.id
         },
         handleClose () {
             this.drawer = true;
             ElMessageBox.confirm('Are you sure you want to close this?')
             .then(() => {
-                console.log(this.product)
                 this.drawer = false;
+                this.body.detail = {
+                    imageUrl: "",
+                    name: "",
+                    nameSecond: "",
+                    price: "",
+                    product: {
+                        id: ""
+                    },
+                    quantity: 1,
+                    uom: {
+                        id: "",
+                        name: "",
+                        nameSecond: ""
+                    },
+                    topping: []
+                }
+                console.log("close")
             }).catch((e) => {
                 console.log(e)
             });
@@ -171,9 +197,11 @@ export default {
         },
         increment() {
             this.body.detail.quantity++;
+            this.body.detail.price = this.calPrice;
         },
         decrement() {
-            this.body.detail.quantity-- ;
+            this.body.detail.quantity--;
+            this.body.detail.price = this.calPrice;
         },
         addSize() {
             console.log(this.body.detail.uom);
@@ -183,30 +211,37 @@ export default {
             this.body.detail.topping = this.body.detail.topping.map((str,) => ({ remark: str}));
         },
         goCart() {
-            const oldProduct = this.cart.find((item) => item.product.id === this.product.id )
-            console.log(oldProduct)
-            console.log(this.body.detail.topping.every(k=>oldProduct.topping.some(d=>d.remark === k.topping.remark)))
-            console.log(this.body.detail.topping.length)
-            console.log(oldProduct.topping.length)
-            if (this.cart.length > 0 
-                && oldProduct.uom.id === this.body.detail.uom.id 
-                && oldProduct.topping.length === this.body.detail.topping.length) {
-                console.log(true)
+            if (this.cart.length > 0) {
+                const oldProduct = this.cart.filter((item) => {
+                    return (item.product.id === this.product.id) 
+                    && (item.uom.id === this.body.detail.uom.id)
+                })
+                console.log(oldProduct)
+                if (oldProduct[0]) {
+                    // check element of topping
+                    // for (let i=0; i<oldProduct.length; i++) {
+                    //     if (oldProduct[i].topping) {}
+                    // }
+                    oldProduct[0].quantity += this.body.detail.quantity
+                    oldProduct[0].price += this.calPrice
+                } else {
+                    console.log(6)
+                    this.cart.push(this.body.detail)
+                }
             } else {
+                console.log(7)
                 this.cart.push(this.body.detail)
             }
             console.log(this.cart)
             localStorage.setItem("cart", JSON.stringify(this.cart))
-            this.drawer = false;
+            this.handleClose();
         },
         buyNow() {
-            this.cart.push(this.body.detail)
-            localStorage.setItem("cart", JSON.stringify(this.cart))
-            console.log(this.cart)
+            this.goCart()
             let phone = localStorage.getItem("phone");
             let address = localStorage.getItem("address");
             if (phone != null && address != null) {
-                this.$router.push({path: "/"});
+                this.$router.push({path: "/confirmOrder"});
             } else {
                 this.$router.push({path: "/addressInfo"});
             }

@@ -1,14 +1,24 @@
 <template>
 <div class="cart-page" >
-        <NavBar />
+        <div class="navbar">
+            <el-icon @click="$router.push({path: '/'})" class="back"><Back /></el-icon>
+            <p><b>Cart</b></p>
+            <button class="deleteAll" @click="deleteAll()">Delete All</button>
+        </div>
         <div class="container">
-            <div class="item" v-for="(item,index) in items" :key="index">
+            <div class="item" v-for="(item,itemIndex) in items" :key="(item,itemIndex)">
                 <div class="logo-detail">
-                    <img :src="item.icon" />
+                    <!-- <img :src="item.imageUrl" /> -->
+                    <img :src=" (item.imageUrl) ? getFullPathImage(item.imageUrl) : require('@/assets/images/food_default.jpeg')" alt/>
                     <div class="detail">
                         <h5>{{ item.name }}</h5>
+                        <p>Topping: 
+                            <span v-for="(topping, toppingIndex) in item.topping" :key="(topping, toppingIndex)">{{ topping.remark }} 
+                                <span v-if="toppingIndex < item.topping.length-1">,</span>
+                            </span>
+                        </p>
                         <p>size: {{ item.size }}</p>
-                        <h5>{{ item.price }}</h5>
+                        <p>Total: <b style="color: #000;">{{ item.price }}$</b></p>
                     </div>
                 </div>
                 <div class="quatity">
@@ -33,7 +43,6 @@
 </template>
 <script>
 import {ref} from 'vue';
-import NavBar from '@/components/NavBar.vue';
 import item1 from '@/assets/icons/item-1.png';
 import item2 from '@/assets/icons/item-2.png';
 import item3 from '@/assets/icons/item-3.png';
@@ -43,7 +52,6 @@ import minus from '@/assets/icons/minus.png'
 import plus from '@/assets/icons/plus.png'
 export default {
     name: "CartView",
-    components: {NavBar},
     data() {
         return {
             item1, item2, item3, item4, item5, minus, plus
@@ -52,126 +60,16 @@ export default {
     setup() {
         const quantity = ref(1);
         const totalPrice = ref(0);
-        const items = ref([
-                {
-                    id: '1',
-                    name: 'StreetBox Roasted Duck',
-                    price: '50.00$',
-                    size: 'm',
-                    icon: item1,
-                    quantity: 1
-                },
-                {
-                    id: '1',
-                    name: 'StreetBox Roasted Duck',
-                    price: '50.00$',
-                    size: 'm',
-                    icon: item1,
-                    quantity: 1
-                },
-                {
-                    id: '1',
-                    name: 'StreetBox Roasted Duck',
-                    price: '50.00$',
-                    size: 'm',
-                    icon: item1,
-                    quantity: 1
-                },
-                {
-                    id: '1',
-                    name: 'StreetBox Roasted Duck',
-                    price: '50.00$',
-                    size: 'm',
-                    icon: item1,
-                    quantity: 1
-                },
-                {
-                    id: '1',
-                    name: 'StreetBox Roasted Duck',
-                    price: '50.00$',
-                    size: 'm',
-                    icon: item1,
-                    quantity: 1
-                },
-                {
-                    id: '1',
-                    name: 'StreetBox Roasted Duck',
-                    price: '50.00$',
-                    size: 'm',
-                    icon: item1,
-                    quantity: 1
-                },
-                {
-                    id: '1',
-                    name: 'StreetBox Roasted Duck',
-                    price: '50.00$',
-                    size: 'm',
-                    icon: item1,
-                    quantity: 1
-                },
-                {
-                    id: '1',
-                    name: 'StreetBox Roasted Duck',
-                    price: '50.00$',
-                    size: 'm',
-                    icon: item1,
-                    quantity: 1
-                },
-                {
-                    id: '1',
-                    name: 'StreetBox Roasted Duck',
-                    price: '50.00$',
-                    size: 'm',
-                    icon: item1,
-                    quantity: 1
-                },
-                {
-                    id: '1',
-                    name: 'StreetBox Roasted Duck',
-                    price: '50.00$',
-                    size: 'm',
-                    icon: item1,
-                    quantity: 1
-                },
-                {
-                    id: '2',
-                    name: 'StreetBox Roasted Duck',
-                    price: '50.00$',
-                    size: 's',
-                    icon: item2,
-                    quantity: 1
-                },
-                {
-                    id: '3',
-                    name: 'StreetBox Roasted Duck',
-                    price: '50.00$',
-                    size: 'm',
-                    icon: item3,
-                    quantity: 1
-                },
-                {
-                    id: '4',
-                    name: 'StreetBox Roasted Duck',
-                    price: '50.00$',
-                    size: 'm',
-                    icon: item4,
-                    quantity: 1
-                },
-                {
-                    id: '5',
-                    name: 'StreetBox Roasted Duck',
-                    price: '50.00$',
-                    size: 'l',
-                    icon: item5,
-                    quantity: 1
-                },
-            ]);
+        const items = ref([]);
 
         return {
             quantity,
             totalPrice,
             items,
         }
+    },
+    created() {
+        this.items = JSON.parse(localStorage.getItem("cart"));
     },
     methods: {
         increment(i) {
@@ -191,7 +89,10 @@ export default {
             } else {
                 this.$router.push({path: "/addressInfo"});
             }
-        }
+        },
+        getFullPathImage(path) {
+            return process.env.VUE_APP_BASE_URL + path
+        },
     },
     computed: {
         // subPrice() {
