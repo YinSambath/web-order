@@ -21,7 +21,7 @@
         </el-input>
     </div>
     
-    <el-button class="btn-confirm" @click="submitInfo">ABC</el-button>
+    <el-button class="btn-confirm" @click="submitInfo">Confirm</el-button>
     
   </div>
 </template>
@@ -53,6 +53,7 @@ export default {
         if (this.phone != "" && this.address != "") {
             localStorage.setItem("phone", this.phone);
             localStorage.setItem("address", this.address);
+            this.$router.push({path: "/confirmOrder"})
         }
     }
   },
