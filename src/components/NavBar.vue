@@ -3,7 +3,10 @@
       <!-- <img class="menu-icon" :src="menuIcon" @click="drawer = true" alt/> -->
       <img class="logo" :src="logoIcon" @click="goHome" alt/>
       <!-- <img class="shopping-cart-icon" :src="shoppingCartIcon" @click="goCart" alt/> -->
-      <el-icon :size="25"><ShoppingCart @click="goCart" /></el-icon>
+      <el-badge :value="cart" :max="99" class="item" v-if="cart">
+        <el-icon class="item"  :size="25"><ShoppingCart @click="goCart" /></el-icon>
+      </el-badge>
+      <el-icon class="item"  :size="25" v-else ><ShoppingCart @click="goCart" /></el-icon>
     </div>
 
     <!-- <el-drawer
@@ -31,10 +34,12 @@ export default {
   },
   setup() {
     const drawer = ref(false);
-
     return {
       drawer,
     }
+  },
+  props: {
+    cart: Number
   },
   methods: {
     goCart() {
@@ -51,7 +56,7 @@ export default {
   width: auto;
   display: flex;
   height: 55px;
-  padding: 0 2vw;
+  padding: 0 45px 0 2vw;
   justify-content: space-between;
   align-items: center;
   background-color: #ffffff;
@@ -66,6 +71,9 @@ export default {
   .shopping-cart-icon {
     width: 2,7vh;
     height: 2.7vh;
+  }
+  .item {
+    cursor: pointer;
   }
 }
 @media screen and (max-width: 600px) {

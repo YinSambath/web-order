@@ -20,6 +20,7 @@
                 background: none;
                 border: none;
                 color: red;
+                cursor: pointer;
             }
           }
         .container {
@@ -36,6 +37,10 @@
                 justify-content: space-between;
                 .logo-detail {
                     display: flex;
+                    max-width: 70%;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
 
                     img {
                         max-width: auto;
@@ -60,43 +65,51 @@
                             color: #999999;
                             font-size: 0.85rem;
                         }
+                    }
                 }
-                }
-                .quatity {
-                    margin: 15px;
+                .right {
                     display: flex;
-                    justify-content: space-around;
-                    align-items: center;
-                    border-radius: 18px;
-                    max-height: 25px;
-
-                    h5 {
-                        margin: 0 10px;
-                        font-weight: 600;
-                    }
-                    .btn-minus {
-                        height: 23px;
-                        width: 23px;
-                        margin: 0 3px;
-                        background-color: #FFBC2D;
-                        border: none;
-
-                        img {
-                            max-width: 10px;
-                            color: #F2F2F2;
+                    flex-direction: column;
+                    justify-content: space-between;
+                    .quatity {
+                        margin: 15px;
+                        display: flex;
+                        justify-content: space-around;
+                        align-items: center;
+                        border-radius: 18px;
+                        max-height: 25px;
+    
+                        h5 {
+                            margin: 0 10px;
+                            font-weight: 600;
+                        }
+                        .btn-minus {
+                            height: 23px;
+                            width: 23px;
+                            margin: 0 3px;
+                            background-color: #FFBC2D;
+                            border: none;
+    
+                            img {
+                                max-width: 10px;
+                                color: #F2F2F2;
+                            }
+                        }
+                        .btn-plus {
+                            height: 23px;
+                            width: 23px;
+                            margin: 0 3px;
+                            border: none;
+                            background-color: #FFBC2D;
+    
+                            img {
+                                max-width: 10px;
+                                color: #F2F2F2;
+                            }
                         }
                     }
-                    .btn-plus {
-                        height: 23px;
-                        width: 23px;
-                        margin: 0 3px;
-                        border: none;
-                        background-color: #FFBC2D;
-
-                        img {
-                            max-width: 10px;
-                            color: #F2F2F2;
-                        }
+                    .delete {
+                        padding: 15px;;
                     }
                 }
             }

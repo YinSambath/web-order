@@ -1,6 +1,6 @@
 <template>
     <div class="index-page" >
-        <NavBar />
+        <NavBar :cart="badge" />
         <div class="filter">
             <div  class="filter-item" :class="{'filter-item-active': index === activeItem }" v-for="(item, index) in category" :key="(item, index)" @click="doFilter(item, index)">
                 <img :src="(item.imageUrl) ? getFullPathImage(item.imageUrl) : require('@/assets/images/user_default.jpeg')" alt/>
@@ -108,6 +108,7 @@ export default {
             quantity: 1,
             additional: [],
             cart: "",
+            badge: 0,
             body: {
                 detail: {
                     imageUrl: "",
@@ -115,7 +116,8 @@ export default {
                     nameSecond: "",
                     price: "",
                     product: {
-                        id: ""
+                        id: "",
+                        price: ""
                     },
                     quantity: 1,
                     uom: {
@@ -130,6 +132,10 @@ export default {
     },
     created() {
         this.getList();
+        this.cart = (JSON.parse(localStorage.getItem("cart")) !== null) ? JSON.parse(localStorage.getItem("cart")) : [] ;
+        if (this.cart[0]) {
+            this.badge = this.cart.length
+        }
     },
     computed: {
         calPrice: function() {
@@ -153,18 +159,29 @@ export default {
             this.filterProduct = this.products.filter((product) => product.category.id === item.id)
         },
         orderDetail(id) {
-            this.drawer = true;
-            this.cart = [];
+            this.cart = []
             this.cart = (JSON.parse(localStorage.getItem("cart")) !== null) ? JSON.parse(localStorage.getItem("cart")) : [] ;
             this.product = this.products.find((item) => item.id === id);
-            this.body.detail.imageUrl = this.product.imageUrl
-            this.body.detail.name = this.product.name
-            this.body.detail.nameSecond = this.product.nameSecond
-            this.body.detail.price = this.calPrice;
-            this.body.detail.uom.id = this.product.productPrice[0].uom.id
-            this.body.detail.uom.name = this.product.productPrice[0].uom.name
-            this.body.detail.uom.nameSecond = this.product.productPrice[0].uom.nameSecond
-            this.body.detail.product.id = this.product.id
+
+            this.body.detail = {
+                imageUrl: this.product.imageUrl,
+                name: this.product.name,
+                nameSecond: this.product.nameSecond,
+                price: this.product.productPrice[0].price,
+                product: {
+                    id: this.product.id,
+                    price: this.product.productPrice[0].price
+                },
+                quantity: 1,
+                uom: {
+                    id: this.product.productPrice[0].uom.id,
+                    name: this.product.productPrice[0].uom.name,
+                    nameSecond: this.product.productPrice[0].uom.nameSecond
+                },
+                topping: []
+            }
+            this.drawer = true;
+            console.log(this.body.detail)
         },
         handleClose () {
             this.drawer = true;
@@ -218,7 +235,7 @@ export default {
                 })
                 console.log(oldProduct)
                 if (oldProduct[0]) {
-                    // check element of topping
+                    // ***** check element of topping *****
                     // for (let i=0; i<oldProduct.length; i++) {
                     //     if (oldProduct[i].topping) {}
                     // }
@@ -232,12 +249,12 @@ export default {
                 console.log(7)
                 this.cart.push(this.body.detail)
             }
-            console.log(this.cart)
             localStorage.setItem("cart", JSON.stringify(this.cart))
-            this.handleClose();
+            this.drawer = false;
+            this.badge = this.cart.length
         },
         buyNow() {
-            this.goCart()
+            
             let phone = localStorage.getItem("phone");
             let address = localStorage.getItem("address");
             if (phone != null && address != null) {
@@ -245,10 +262,7 @@ export default {
             } else {
                 this.$router.push({path: "/addressInfo"});
             }
-        },
-        designDataProduct() {
-
-        },
+        }
     }
 }
 </script>

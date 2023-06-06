@@ -8,17 +8,17 @@
             <div class="user-info" @click="goEdit">
                 <div class="left-info">
                     <img :src="phoneIcon" alt/>
-                    <p>010827251</p>
+                    <p>{{ phone }}</p>
                 </div>
-                <img :src="arrowBack" alt/>
+                <el-icon><Right /></el-icon>
             </div>
             <el-divider />
             <div class="user-info" @click="goEdit">
                 <div class="left-info">
                     <img :src="locationIcon" alt/>
-                    <p>phone penh</p>
+                    <p>{{ address }}</p>
                 </div>
-                <img :src="arrowBack" alt/>
+                <el-icon><Right /></el-icon>
             </div>
             <el-divider />
             <div class="food-list">
@@ -82,55 +82,43 @@
       };
     },
     setup() {
-      const phone = ref('');
-      const address = ref('');
-      const items = ref([
-                {
-                    id: '1',
-                    name: 'StreetBox Roasted Duck',
-                    price: '50.00$',
-                    size: 'm',
-                    icon: item2,
-                    quantity: 1
-                },
-                {
-                    id: '2',
-                    name: 'StreetBox Roasted Duck',
-                    price: '50.00$',
-                    size: 's',
-                    icon: item2,
-                    quantity: 1
-                },
-                {
-                    id: '3',
-                    name: 'StreetBox Roasted Duck',
-                    price: '50.00$',
-                    size: 'm',
-                    icon: item3,
-                    quantity: 1
-                },
-                // {
-                //     id: '4',
-                //     name: 'StreetBox Roasted Duck',
-                //     price: '50.00$',
-                //     size: 'm',
-                //     icon: item4,
-                //     quantity: 1
-                // },
-                // {
-                //     id: '5',
-                //     name: 'StreetBox Roasted Duck',
-                //     price: '50.00$',
-                //     size: 'l',
-                //     icon: item5,
-                //     quantity: 1
-                // },
-            ]);
-      return {
-          phone,
-          address,
-          items
-      };
+        const phone = ref('');
+        const address = ref('');
+        const items = ref([
+            {
+                id: '1',
+                name: 'StreetBox Roasted Duck',
+                price: '50.00$',
+                size: 'm',
+                icon: item2,
+                quantity: 1
+            },
+            {
+                id: '2',
+                name: 'StreetBox Roasted Duck',
+                price: '50.00$',
+                size: 's',
+                icon: item2,
+                quantity: 1
+            },
+            {
+                id: '3',
+                name: 'StreetBox Roasted Duck',
+                price: '50.00$',
+                size: 'm',
+                icon: item3,
+                quantity: 1
+            },
+        ]);
+        return {
+            phone,
+            address,
+            items
+        };
+    },
+    created() {
+        this.phone = localStorage.getItem("phone")
+        this.address = localStorage.getItem("address")
     },
     methods: {
         goBack() {

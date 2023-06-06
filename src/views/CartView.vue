@@ -3,7 +3,7 @@
         <div class="navbar">
             <el-icon @click="$router.push({path: '/'})" class="back"><Back /></el-icon>
             <p><b>Cart</b></p>
-            <button class="deleteAll" @click="deleteAll()">Delete All</button>
+            <button class="deleteAll" @click="dialogClear = true" :disabled="!items">Delete All</button>
         </div>
         <div class="container">
             <div class="item" v-for="(item,itemIndex) in items" :key="(item,itemIndex)">
@@ -21,51 +21,71 @@
                         <p>Total: <b style="color: #000;">{{ item.price }}$</b></p>
                     </div>
                 </div>
-                <div class="quatity">
-                    <el-button @click.prevent="decrement(index)" :disabled="item.quantity == 1" class="btn-minus" circle>
-                        <img :src="minus" />
-                    </el-button>
-                    <h5>{{ item.quantity }}</h5>
-                    <el-button @click.prevent="increment(index)" class="btn-plus" circle>
-                        <img :src="plus" />
-                    </el-button>
+                <div class="right">
+                    <div class="quatity">
+                        <el-button @click.prevent="decrement(itemIndex)" :disabled="item.quantity == 1" class="btn-minus" circle>
+                            <img :src="minus" />
+                        </el-button>
+                        <h5>{{ item.quantity }}</h5>
+                        <el-button @click.prevent="increment(itemIndex)" class="btn-plus" circle>
+                            <img :src="plus" />
+                        </el-button>
+                    </div>
+                    <div class="delete">
+                        <el-icon color="#FF0000" style="cursor: pointer;" @click="removeItem(itemIndex)"><Delete /></el-icon>
+                    </div>
                 </div>
             </div>
         </div>
         <div class="price-checkout">
             <div class="total-price">
-                <h4 class="red-text">Total</h4>
-                <h4 class="green-text">1500.00$</h4>
+                <h4 class="red-text">Total:</h4>
+                <h4 class="green-text">${{ subPrice }}</h4>
             </div>
             <el-button class="checkout-btn" @click="checkOut">Check Out</el-button>
         </div>
     </div>
+    <el-dialog
+        v-model="dialogClear"
+        title="Warning"
+        width="30%"
+        aligh-center
+        center
+    >
+        <span style="text-align: center;">Are you sure you want to delete all item in cart?</span>
+        <template #footer>
+        <span class="dialog-footer">
+            <el-button @click="dialogClear = false">Cancel</el-button>
+            <el-button type="danger" @click="clearCart()">Delete</el-button>
+        </span>
+        </template>
+    </el-dialog>
 </template>
 <script>
 import {ref} from 'vue';
-import item1 from '@/assets/icons/item-1.png';
-import item2 from '@/assets/icons/item-2.png';
-import item3 from '@/assets/icons/item-3.png';
-import item4 from '@/assets/icons/item-4.png';
-import item5 from '@/assets/icons/item-5.png';
 import minus from '@/assets/icons/minus.png'
 import plus from '@/assets/icons/plus.png'
 export default {
     name: "CartView",
     data() {
         return {
-            item1, item2, item3, item4, item5, minus, plus
+            minus, plus
         }
     },
     setup() {
         const quantity = ref(1);
         const totalPrice = ref(0);
         const items = ref([]);
+        const dialogClear = ref(false);
+        const quantityUpdated = ref('');
 
         return {
             quantity,
             totalPrice,
             items,
+            dialogClear,
+            quantityUpdated,
+            
         }
     },
     created() {
@@ -74,11 +94,11 @@ export default {
     methods: {
         increment(i) {
             this.items[i].quantity++;
-            console.log(this.items[i]);
+            this.items[i].price = this.calPrice(i)
         },
         decrement(i) {
-            this.items[i].quantity-- ;
-            console.log(this.items[i]);
+            this.items[i].quantity--;
+            this.items[i].price = this.calPrice(i)
         },
         checkOut() {
             let phone = localStorage.getItem("phone");
@@ -93,12 +113,27 @@ export default {
         getFullPathImage(path) {
             return process.env.VUE_APP_BASE_URL + path
         },
+        clearCart() {
+            this.items = []
+            localStorage.removeItem('cart');
+            this.dialogClear = false
+        },
+        calPrice(itemIndex) {
+            console.log(itemIndex)
+            return this.items[itemIndex].product.price * this.items[itemIndex].quantity
+        },
+        removeItem(itemIndex) {
+            this.items.splice(itemIndex, 1);
+            console.log(this.items);
+            localStorage.setItem("cart", JSON.stringify(this.items))
+        }
+
     },
     computed: {
-        // subPrice() {
-        //     const price = this.items.price * this.items.quantity;
-        //     return price
-        // }
+        subPrice() {
+            const total = this.items.reduce((partialSum, item) => partialSum + (parseFloat(item.price)), 0);
+            return total;
+        }
     }
 
 }
