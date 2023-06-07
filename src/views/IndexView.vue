@@ -254,7 +254,28 @@ export default {
             this.badge = this.cart.length
         },
         buyNow() {
-            
+            if (this.cart.length > 0) {
+                const oldProduct = this.cart.filter((item) => {
+                    return (item.product.id === this.product.id) 
+                    && (item.uom.id === this.body.detail.uom.id)
+                })
+                console.log(oldProduct)
+                if (oldProduct[0]) {
+                    // ***** check element of topping *****
+                    // for (let i=0; i<oldProduct.length; i++) {
+                    //     if (oldProduct[i].topping) {}
+                    // }
+                    oldProduct[0].quantity += this.body.detail.quantity
+                    oldProduct[0].price += this.calPrice
+                } else {
+                    console.log(6)
+                    this.cart.push(this.body.detail)
+                }
+            } else {
+                console.log(7)
+                this.cart.push(this.body.detail)
+            }
+            localStorage.setItem("cart", JSON.stringify(this.cart))
             let phone = localStorage.getItem("phone");
             let address = localStorage.getItem("address");
             if (phone != null && address != null) {

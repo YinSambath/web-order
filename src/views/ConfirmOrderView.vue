@@ -1,61 +1,73 @@
 <template>
-    <div class="confirm-order">
+    <div class="confirm-order" v-if="isOrder === false">
         <div class="top-detail">
-            <img class="arrow-left" :src="arrowBack" @click="goBack" alt />
+            <el-icon @click="goBack"><Back /></el-icon>
             <h3>Confirm Order</h3>
+            <div></div>
         </div>
         <div class="confirm-order-list">
             <div class="user-info" @click="goEdit">
                 <div class="left-info">
-                    <img :src="phoneIcon" alt/>
-                    <p>{{ phone }}</p>
+                    <el-icon :size="25"><Cellphone /></el-icon>
+                    <p>{{ body.phone }}</p>
                 </div>
                 <el-icon><Right /></el-icon>
             </div>
             <el-divider />
             <div class="user-info" @click="goEdit">
                 <div class="left-info">
-                    <img :src="locationIcon" alt/>
-                    <p>{{ address }}</p>
+                    <el-icon :size="25"><Location /></el-icon>
+                    <p>{{ body.address }}</p>
                 </div>
                 <el-icon><Right /></el-icon>
             </div>
             <el-divider />
             <div class="food-list">
-                <div class="item-box" v-for="item in items" :key="item.id">
-                    <div class="logo-detail">
-                        <img :src="item.icon" />
-                        <div class="detail">
-                            <h5>{{ item.name }}</h5>
-                            <p>size: {{ item.size }}</p>
-                            <h5>{{ item.price }}</h5>
+                <div class="item-box" v-for="(item,itemIndex) in items" :key="(item,itemIndex)">
+                    <div class="item-box-detail">
+                        <div class="logo-detail">
+                            <img :src=" (item.imageUrl) ? getFullPathImage(item.imageUrl) : require('@/assets/images/food_default.jpeg')" alt/>
+                            <div class="detail">
+                                <h5>{{ item.name }}</h5>
+                                <p>Topping: 
+                                    <span v-for="(topping, toppingIndex) in item.topping" :key="(topping, toppingIndex)">{{ topping.remark }} 
+                                        <span v-if="toppingIndex < item.topping.length-1">,</span>
+                                    </span>
+                                </p>
+                                <p>size: {{ item.uom.name }}</p>
+                            </div>
+                        </div>
+                        <div class="price-detail">
+                            <p>Quantity: {{ item.quantity }}</p>
+                            <h5>price: $ {{ item.price }}</h5>
                         </div>
                     </div>
+                    <el-divider v-if="itemIndex !== items.length-1" />
                 </div>
             </div>
             <el-divider />
             <div class="price-list">
                 <span>
                     <p class="price-text">Subtotal</p>
-                    <p class="price-text">$14.00</p>
+                    <p class="price-text">$ {{ subPrice.toFixed(2) }}</p>
                 </span>
                 <span>
-                    <p class="price-text">Tax 10% (VAT included)</p>
-                    <p class="price-text">$0.10</p>
+                    <p class="price-text">Tax {{ this.vat }}% (VAT included)</p>
+                    <p class="price-text">$ {{ this.calVat.toFixed(2) }}</p>
                 </span>
                 <span>
                     <p class="price-text">Discount</p>
-                    <p class="price-text">$3.50</p>
+                    <p class="price-text">$ {{ this.calDis.toFixed(2) }}</p>
                 </span>
                 <span>
                     <p class="price-text">Delivery</p>
-                    <p class="price-text">$1.50</p>
+                    <p class="price-text">$ {{ this.delivery.toFixed(2) }}</p>
                 </span>
                 <el-button class="voucher" link>Apply Voucher</el-button>
                 <el-divider />
                 <span>
                     <p class="total-price">Order total:</p>
-                    <p class="total-price">USD $15.50</p>
+                    <p class="total-price">USD {{ orderTotal.toFixed(2) }}</p>
                 </span>
             </div>
         </div>
@@ -63,62 +75,55 @@
             <el-button class="btn-confirm" @click="submitInfo">Order now</el-button>
         </div>
     </div>
+    <div class="success-alert" v-else>
+        <el-result
+            class="result"
+            icon="success"
+            title="Success order"
+            sub-title="Please enjoy your foods"
+        >
+      </el-result>
+    </div>
 </template>
 <script>
-    import { ref } from "vue";   
-    import arrowBack from "@/assets/icons/arrow-back.png";
-    import locationIcon from "@/assets/icons/location-icon.png";
-    import phoneIcon from "@/assets/icons/phone.png";
-    import item1 from '@/assets/icons/item-1.png';
-    import item2 from '@/assets/icons/item-2.png';
-    import item3 from '@/assets/icons/item-3.png';
-    import item4 from '@/assets/icons/item-4.png';
-    import item5 from '@/assets/icons/item-5.png';
+    import ApiService from "@/services/ApiService";
+import { ref } from "vue";   
   export default {
     name: "confirmOrderView",
     data() {
       return {
-        arrowBack, locationIcon, phoneIcon, item1, item2, item3, item4, item5
+        isOrder: false,
+        body: {
+            address: "",
+            detail: [],
+            firstName: "",
+            lastName: "",
+            latitude: 0,
+            longitude: 0,
+            phone: "",
+            taxAmount: 0,
+            totalPrice: 0
+        }
       };
     },
     setup() {
-        const phone = ref('');
-        const address = ref('');
-        const items = ref([
-            {
-                id: '1',
-                name: 'StreetBox Roasted Duck',
-                price: '50.00$',
-                size: 'm',
-                icon: item2,
-                quantity: 1
-            },
-            {
-                id: '2',
-                name: 'StreetBox Roasted Duck',
-                price: '50.00$',
-                size: 's',
-                icon: item2,
-                quantity: 1
-            },
-            {
-                id: '3',
-                name: 'StreetBox Roasted Duck',
-                price: '50.00$',
-                size: 'm',
-                icon: item3,
-                quantity: 1
-            },
-        ]);
+        const items = ref([]);
+        const vat = ref(0);
+        const discount = ref(0);
+        const delivery = ref(0);
         return {
-            phone,
-            address,
-            items
+            items,
+            vat,
+            discount,
+            delivery
         };
     },
     created() {
-        this.phone = localStorage.getItem("phone")
-        this.address = localStorage.getItem("address")
+        this.body.phone = localStorage.getItem("phone")
+        this.body.address = localStorage.getItem("address")
+        this.body.firstName = localStorage.getItem("firstName")
+        this.body.lastName = localStorage.getItem("lastName")
+        this.items = JSON.parse(localStorage.getItem("cart"))
     },
     methods: {
         goBack() {
@@ -129,30 +134,64 @@
         },
         submitInfo() {
             if (this.phone != "" && this.address != "") {
-                localStorage.setItem("phone", this.phone);
-                localStorage.setItem("address", this.address);
-        }
-      }
+                const body = {
+                    firstname: this.body.firstName,
+                    lastName: this.body.lastName,
+                    phone: this.body.phone,
+                    address: this.body.address,
+                    latitude: this.body.latitude,
+                    longitude: this.body.longitude,
+                    textAmount: this.calVat,
+                    totalPrice: this.grandTotal,
+                    detail: this.items
+                }
+                ApiService.getOrder(body).then((result) => {
+                    if (result.response.status === 200) {
+                        this.isOrder = true;
+                        localStorage.removeItem('cart');
+                        setTimeout(() =>this.$router.push({path: '/'}), 2000);
+                    }
+                })
+            } else {
+                this.$router.push({path: '/addressInfo'})
+            }
+        },
+        getFullPathImage(path) {
+            return process.env.VUE_APP_BASE_URL + path
+        },
     },
+    computed: {
+        subPrice() {
+            const total = this.items.reduce((partialSum, item) => partialSum + (parseFloat(item.price)), 0);
+            return total;
+        },
+        calVat() {
+            const grandVat = this.subPrice * (this.vat / 100);
+            return grandVat;
+        },
+        calDis() {
+            const grandDis = this.subPrice * (this.discount / 100);
+            return grandDis;
+        },
+        orderTotal() {
+            const grandTotal = this.subPrice + this.calVat - this.calDis + this.delivery;
+            return grandTotal;
+        }
+    }
   };
 </script>
 <style scoped lang="scss">
     .confirm-order {
         height: auto;
+        min-height: 100vh;
         .top-detail {
             background-color: #ffffff;
             position: relative;
             height: 55px;
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
             align-items: center;
-            .arrow-left {
-                position: absolute;
-                top: 15px;
-                left: 15px;
-                width: 20px;
-                height: 20px;
-            }
+            padding: 0 2vw;
             h3 {
                 margin: 0;
             }
@@ -167,6 +206,7 @@
             .user-info {
                 display: flex;
                 justify-content: space-between;
+                align-items: center;
                 height: 50px;
                 padding: 0 15px;
                 .left-info {
@@ -176,12 +216,7 @@
                         margin: 0;
                         align-self: center;
                         font-weight: 650;
-                    }
-                    img {
-                        align-self: center;
-                        width: 25px;
-                        height: 25px;
-                        margin-right: 15px;
+                        margin-left: 10px;
                     }
                 }
                 img {
@@ -197,35 +232,59 @@
                     height: 85px;
                     background-color: #ffffff;
                     display: flex;
-                    margin: 15px 0;
-                    .logo-detail {
-                    display: flex;
+                    flex-direction: column;
+                    margin: 20px 0;
+                    gap: 10px;
+                    .item-box-detail {
+                        display: flex;
+                        justify-content: space-between;
+                        .logo-detail {
+                            display: flex;  
 
-                        img {
-                            max-width: auto;
-                            max-height: 85px;
-                            margin: auto 12px;
-                            border-radius: 50%; 
-                        }
-                        .detail {
-                            display: grid;
-                            align-items: center;
-                            margin: 15px 0;
-                            h5, p {
-                                overflow: hidden;
-                                white-space: nowrap;
-                                text-overflow: ellipsis;
+                            img {
+                                max-width: auto;
+                                max-height: 85px;
+                                margin: auto 12px;
+                                border-radius: 50%; 
+                            }
+                            .detail {
+                                display: grid;
                                 margin: 0;
-                                text-align: start;
-                                align-self: center;
+                                gap: 5px;
+                                max-width: 70%;
+                                overflow: hidden;
+                                text-overflow: ellipsis;
+                                white-space: nowrap;
+                                h5, p {
+                                    overflow: hidden;
+                                    white-space: nowrap;
+                                    text-overflow: ellipsis;
+                                    margin: 0;
+                                    text-align: start;
+                                    align-self: center;
+                                    overflow: hidden;
+                                    text-overflow: ellipsis;
+                                    white-space: nowrap;
+                                }
+                                p {
+                                    color: #999999;
+                                    font-size: 0.85rem;
+                                }
+                            }
+                        }
+                    .price-detail {
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: space-between;
+                        align-items: end;
 
-                            }
-                            p {
-                                color: #999999;
-                                font-size: 0.85rem;
-                            }
+                        h5,p {
+                            margin: 0;
+                            line-height: 20px;
                         }
                     }
+                    }
+                    
                 }
             }
             .price-list {
@@ -285,6 +344,22 @@
         :deep(.el-input__inner) {
             color: black;
         } 
+  }
+  .success-alert {
+    min-height: 100vh;
+    width: 100%;
+    .result {
+        height: 100vh;
+        max-height: 100vh;
+        // change color of success order
+        :deep(.el-result__title p) {
+            color: #67c23a;
+        }
+    }
+    // change color of tick icon
+    :deep(.el-result .icon-success) {
+        color: pink;
+    }
   }
   
   </style>

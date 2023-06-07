@@ -1,11 +1,11 @@
 <template>
-<div class="cart-page" >
+    <div class="cart-page">
         <div class="navbar">
             <el-icon @click="$router.push({path: '/'})" class="back"><Back /></el-icon>
             <p><b>Cart</b></p>
-            <button class="deleteAll" @click="dialogClear = true" :disabled="!items">Delete All</button>
+            <button class="deleteAll" @click="dialogClear = true" :disabled="!items.length > 0">Delete All</button>
         </div>
-        <div class="container">
+        <div class="container" v-if="items.length !== 0">
             <div class="item" v-for="(item,itemIndex) in items" :key="(item,itemIndex)">
                 <div class="logo-detail">
                     <!-- <img :src="item.imageUrl" /> -->
@@ -32,15 +32,24 @@
                         </el-button>
                     </div>
                     <div class="delete">
-                        <el-icon color="#FF0000" style="cursor: pointer;" @click="removeItem(itemIndex)"><Delete /></el-icon>
+                        <el-icon color="#FF0000" style="cursor: pointer;" @click="deleteItem(itemIndex)"><Delete /></el-icon>
                     </div>
                 </div>
             </div>
         </div>
+        <div class="emptyCart" v-else>
+            <el-result
+                class="empty"
+                icon="warning"
+                title="No items"
+            >
+            </el-result>
+        </div>
+        <el-divider style="margin: 0;"></el-divider>
         <div class="price-checkout">
             <div class="total-price">
                 <h4 class="red-text">Total:</h4>
-                <h4 class="green-text">${{ subPrice }}</h4>
+                <h4 class="green-text">$ {{ subPrice }}</h4>
             </div>
             <el-button class="checkout-btn" @click="checkOut">Check Out</el-button>
         </div>
@@ -65,6 +74,7 @@
 import {ref} from 'vue';
 import minus from '@/assets/icons/minus.png'
 import plus from '@/assets/icons/plus.png'
+import { ElMessage } from 'element-plus'
 export default {
     name: "CartView",
     data() {
@@ -101,14 +111,20 @@ export default {
             this.items[i].price = this.calPrice(i)
         },
         checkOut() {
-            let phone = localStorage.getItem("phone");
-            let address = localStorage.getItem("address");
-            console.log(phone);
-            if (phone != null && address != null) {
-                this.$router.push({path: "/"});
+            if (this.items.length > 0) {
+                localStorage.setItem("cart", JSON.stringify(this.items))
+                let phone = localStorage.getItem("phone");
+                let address = localStorage.getItem("address");
+                console.log(this.cart);
+                if (phone != null && address != null) {
+                    this.$router.push({path: "/confirmOrder"});
+                } else {
+                    this.$router.push({path: "/addressInfo"});
+                }
             } else {
-                this.$router.push({path: "/addressInfo"});
+                ElMessage.error('No item')
             }
+            
         },
         getFullPathImage(path) {
             return process.env.VUE_APP_BASE_URL + path
@@ -122,17 +138,20 @@ export default {
             console.log(itemIndex)
             return this.items[itemIndex].product.price * this.items[itemIndex].quantity
         },
-        removeItem(itemIndex) {
+        deleteItem(itemIndex) {
             this.items.splice(itemIndex, 1);
-            console.log(this.items);
             localStorage.setItem("cart", JSON.stringify(this.items))
+            
         }
 
     },
     computed: {
         subPrice() {
-            const total = this.items.reduce((partialSum, item) => partialSum + (parseFloat(item.price)), 0);
-            return total;
+            if (this.items) {
+                const total = this.items.reduce((partialSum, item) => partialSum + (parseFloat(item.price)), 0);
+                return total;
+            }
+            return 0;
         }
     }
 

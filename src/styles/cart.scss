@@ -1,7 +1,7 @@
 
     .cart-page {
         max-width: 820px;
-        height: 100vh;
+        min-height: 100vh;
         overflow: hidden;
         // background-color: red;
         .navbar {
@@ -114,9 +114,21 @@
                 }
             }
         }
+        .emptyCart {
+            max-height: 80vh;
+            height: 80vh;
+            .empty {
+                height: 80vh;
+            }
+            :deep(.el-result .icon-warning) {
+                color: pink;
+            }
+        }
         .price-checkout {
-            margin: 0 15px;
+            padding: 15px;
+            background-color: #ffffff;
             .total-price {
+                
                 display: flex;
                 justify-content: space-between;
 
@@ -137,6 +149,7 @@
                 color: #ffffff;
             }
         }
+        
     }
     @media screen and (max-width: 415px) {
         .cart-page {
